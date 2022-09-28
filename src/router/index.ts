@@ -1,145 +1,62 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Layout from '@/layout/index.vue'
 import store from '@/store'
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css'
+import routes from './modules'
 
 Vue.use(VueRouter)
-
-// 路由配置规则
-const routes: Array<RouteConfig> = [
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import(/* webpackChunkName: 'login' */ '@/views/login/index.vue')
-  },
-  {
-    path: '/',
-    component: Layout,
-    meta: {
-      requiresAuth: true
-    },
-    children: [
-      {
-        path: '', // 默认子路由
-        name: 'home',
-        component: () => import(/* webpackChunkName: 'home' */ '@/views/home/index.vue')
-      },
-      {
-        path: '/role',
-        name: 'role',
-        component: () => import(/* webpackChunkName: 'role' */ '@/views/role/index.vue')
-      },
-      {
-        path: '/menu',
-        name: 'menu',
-        component: () => import(/* webpackChunkName: 'menu' */ '@/views/menu/index.vue')
-      },
-      {
-        path: '/resource',
-        name: 'resource',
-        component: () => import(/* webpackChunkName: 'resource' */ '@/views/resource/index.vue')
-      },
-      {
-        path: '/course',
-        name: 'course',
-        component: () => import(/* webpackChunkName: 'course' */ '@/views/course/index.vue')
-      },
-      {
-        path: '/user',
-        name: 'user',
-        component: () => import(/* webpackChunkName: 'user' */ '@/views/user/index.vue')
-      },
-      {
-        path: '/advert',
-        name: 'advert',
-        component: () => import(/* webpackChunkName: 'advert' */ '@/views/advert/index.vue')
-      },
-      {
-        path: '/advert-space',
-        name: 'advert-space',
-        component: () => import(/* webpackChunkName: 'advert-space' */ '@/views/advert-space/index.vue')
-      },
-      {
-        path: '/menu/create',
-        name: 'menu-create',
-        component: () => import(/* webpackChunkName: 'menu-create-edit' */ '@/views/menu/create.vue')
-      },
-      {
-        path: '/menu/:id/edit',
-        name: 'menu-edit',
-        component: () => import(/* webpackChunkName: 'menu-create-edit' */ '@/views/menu/edit.vue')
-      },
-      {
-        path: '/role/:roleId/alloc-menu',
-        name: 'alloc-menu',
-        component: () => import(/* webpackChunkName: 'alloc-menu' */ '@/views/role/alloc-menu.vue'),
-        props: true // 将路由路径参数映射到组件的 props 数据中
-      },
-      {
-        path: '/role/:roleId/alloc-resource',
-        name: 'alloc-resource',
-        component: () => import(/* webpackChunkName: 'alloc-menu' */ '@/views/role/alloc-resource.vue'),
-        props: true // 将路由路径参数映射到组件的 props 数据中
-      },
-      {
-        path: '/course/create',
-        name: 'course-create',
-        component: () => import(/* webpackChunkName: 'course-create' */ '@/views/course/create.vue')
-      },
-      {
-        path: '/course/:courseId/edit',
-        name: 'course-edit',
-        component: () => import(/* webpackChunkName: 'course-edit' */ '@/views/course/edit.vue'),
-        props: true
-      },
-      {
-        path: '/course/:courseId/section',
-        name: 'course-section',
-        component: () => import(/* webpackChunkName: 'course-section' */ '@/views/course/section.vue'),
-        props: true
-      },
-      {
-        path: '/course/:courseId/video',
-        name: 'course-video',
-        component: () => import(/* webpackChunkName: 'course-video' */ '@/views/course/video.vue'),
-        props: true
-      }
-    ]
-  },
-  {
-    path: '*',
-    name: '404',
-    component: () => import(/* webpackChunkName: '404' */ '@/views/error-page/404.vue')
-  }
-]
 
 const router = new VueRouter({
   routes
 })
 
-// 全局前置守卫：任何页面的访问都要经过这里
-// to：要去哪里的路由信息
-// from：从哪里来的路由信息
-// next：通行的标志
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  nprogress.start()
   // to.matched 是一个数组（匹配到是路由记录）
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!store.state.user) {
       // 跳转到登录页面
-      next({
+      return next({
         name: 'login',
         query: { // 通过 url 传递查询字符串参数
           redirect: to.fullPath // 把登录成功需要返回的页面告诉登录页面
         }
       })
-    } else {
-      next() // 允许通过
     }
-  } else {
-    next() // 允许通过
-  }
+    // 用户登陆了，获取权限列表，生成权限路由
+    // 动态的把权限路由添加到路由表中
+    // router.addRoute()
+    // 这里不采取这个方法
 
-  // // 路由守卫中一定要调用 next，否则页码无法展示
+    // const { menuList } = await store.dispatch('getUserPermissons')
+    // 获取用户权限
+    const { menuList } = await store.dispatch('getUserPermissons')
+    for (let i = 0; i < menuList.length; i++) {
+      const menu = menuList[i]
+      //  有权限，允许通过
+      if (menu.href === to.meta!.menuId) {
+        return next()
+      }
+      if (menu.subMenuList) {
+        for (let j = 0; j < menu.subMenuList.length; j++) {
+          const subMenu = menu.subMenuList[j]
+          //  有权限，允许通过
+          if (subMenu.href === to.meta!.menuId) {
+            return next()
+          }
+        }
+      }
+    }
+
+    // 代码执行到这里就是没有权限的
+    return next('/not-permission')
+  }
+  next()
+})
+
+router.afterEach(() => {
+  nprogress.done()
 })
 
 export default router

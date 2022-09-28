@@ -15,7 +15,7 @@
       :before-upload="beforeAvatarUpload"
       :http-request="handleUpload"
     >
-      <img v-if="value" :src="value" class="avatar"/>
+      <img v-if="value" :src="value" class="avatar" />
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
   </div>
@@ -56,14 +56,12 @@ export default Vue.extend({
       return isJPG && isLt2M
     },
 
-    // http-request 覆盖默认的上传行为，可以自定义上传的实现
     async handleUpload (options: any) {
       try {
         this.isUploading = true
         const fd = new FormData()
         fd.append('file', options.file)
         const { data } = await uploadCourseImage(fd, e => {
-          // 计算上传进度
           this.percentage = Math.floor(e.loaded / e.total * 100)
         })
         if (data.code === '000000') {
@@ -99,14 +97,14 @@ export default Vue.extend({
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 178px;
+  width: 250px;
   height: 178px;
   line-height: 178px;
   text-align: center;
 }
 
 .avatar {
-  width: 178px;
+  width: 250px;
   height: 178px;
   display: block;
 }

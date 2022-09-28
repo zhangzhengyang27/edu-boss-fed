@@ -26,7 +26,7 @@ export const login = (data: User) => {
 export const getUserInfo = () => {
   return request({
     method: 'GET',
-    url: '/front//user/getInfo'
+    url: '/front/user//getInfo'
   })
 }
 
@@ -45,5 +45,12 @@ export const forbidUser = (userId: string | number) => {
     params: {
       userId
     }
+  })
+}
+
+export const getUserPermissions = () => {
+  return request({
+    method: 'GET',
+    url: '/boss/permission/getUserPermissions'
   })
 }

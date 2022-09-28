@@ -22,8 +22,3 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-
-### package 省略的配置
-"gitHooks": {
-    "pre-commit": "lint-staged"
-},

@@ -14,7 +14,12 @@
         <el-form-item label="上级菜单">
           <el-select v-model="form.parentId" placeholder="请选择上级菜单">
             <el-option :value="-1" label="无上级菜单"></el-option>
-            <el-option :label="item.name" :value="item.id" v-for="item in parentMenuList" :key="item.id"></el-option>
+            <el-option
+              :label="item.name"
+              :value="item.id"
+              v-for="item in parentMenuList"
+              :key="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="描述">
@@ -34,7 +39,9 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">提交</el-button>
-          <el-button v-if="!isEdit">重置</el-button>
+          <el-button
+            v-if="!isEdit"
+          >重置</el-button>
         </el-form-item>
       </el-form>
     </el-card>

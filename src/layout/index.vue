@@ -31,17 +31,14 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .el-container {
-  // 如果设置 100% 是相对于父元素的
   min-height: 100vh;
-  // 设置最小宽度
-  //min-width: 980px;
 }
 
 .el-aside {
   position: sticky;
   top: 0;
   max-height: 100vh;
-  background: #d3dce6;
+  background: #545c64;
 }
 
 .el-header {

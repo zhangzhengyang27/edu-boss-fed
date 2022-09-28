@@ -12,7 +12,6 @@ export const createOrUpdateMenu = (data: any) => {
   })
 }
 
-// 获取编辑菜单页面信息
 export const getEditMenuInfo = (id: string | number = -1) => {
   return request({
     method: 'GET',
@@ -30,7 +29,6 @@ export const getAllMenus = () => {
   })
 }
 
-// 删除菜单
 export const deleteMenu = (id: number) => {
   return request({
     method: 'DELETE',

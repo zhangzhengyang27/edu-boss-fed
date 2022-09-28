@@ -1,6 +1,14 @@
 <template>
   <div class="login">
-    <!-- label-position="top" -->
+    <!--
+      1. :model="ruleForm"
+      2. :rules="rules"
+      3. ref="ruleForm"
+      4. el-form-item 绑定 prop 属性
+     -->
+    <div>
+      <img class="logo" src="@/assets/logo.png" alt="EduBoss">
+    </div>
     <el-form
       class="login-form"
       label-position="top"
@@ -8,7 +16,9 @@
       :model="form"
       :rules="rules"
       label-width="80px"
+      size="medium"
     >
+      <h2 class="form-title">系统登录</h2>
       <el-form-item label="手机号" prop="phone">
         <el-input v-model="form.phone"></el-input>
       </el-form-item>
@@ -16,7 +26,13 @@
         <el-input type="password" v-model="form.password"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button class="login-btn" type="primary" :loading="isLoginLoading" @click="onSubmit">登录</el-button>
+        <el-button
+          class="login-btn"
+          type="primary"
+          :loading="isLoginLoading"
+          @click="onSubmit"
+        >登录
+        </el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -45,7 +61,6 @@ export default Vue.extend({
           { min: 6, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
         ]
       },
-      // 登录期间显示 loading
       isLoginLoading: false
     }
   },
@@ -61,6 +76,12 @@ export default Vue.extend({
 
         // 2. 验证通过 -> 提交表单
         const { data } = await login(this.form)
+        // const { data } = await request({
+        //   method: 'POST',
+        //   url: '/front/user/login',
+        //   headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        //   data: qs.stringify(this.form) // axios 默认发送的是 application/json 格式的数据
+        // })
 
         // 3. 处理请求结果
         //    失败：给出提示
@@ -89,14 +110,27 @@ export default Vue.extend({
 .login {
   height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  .logo {
+    width: 100px;
+    margin: 20px;
+    margin-top: -100px;
+  }
 
   .login-form {
     width: 300px;
     background: #fff;
-    padding: 20px;
+    padding: 30px;
     border-radius: 5px;
+
+    .form-title {
+      margin: 0 0 1rem;
+      font-weight: 400;
+      font-size: 1.5rem;
+    }
   }
 
   .login-btn {
